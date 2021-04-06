@@ -18,20 +18,20 @@ db_name = 'regular_monitoring'
 engine = create_engine(f'mysql+pymysql://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}', echo=True)
 
 # 报表基础参数
-p_stat_dt = "\'2021-02-28\'"
+p_stat_dt = "\'2021-03-31\'"
 p_curr_cd = "\'HRMB\'"
-p_peroid = 'M'
+p_peroid = "\'M\'"
 p_org = "\'BSBK9999\'"
 
 sql_indic_map = "SELECT CONCAT(L.TB,\'_\',L.TYPE,\'_\',L.NBR) AS INDIC_KEY,L.INDIC_NAME FROM t00_indic_list L " \
                 "WHERE 1=1  AND TB=\'ZCFZ\'  AND IS_DISPLAY = \'1\'  ORDER BY DISPLAY_SEQ    " \
 
-sql_fz_1 =  " SELECT T.INDIC_KEY, T.STAT_DT, ROUND(T.IND_VAL/10000,2) IND_VAL FROM T09_RM_INDIC T,T00_INDIC_LIST L " \
+sql_fz_1 = " SELECT T.INDIC_KEY, T.STAT_DT, ROUND(T.IND_VAL/10000,2) IND_VAL FROM T09_RM_INDIC T,T00_INDIC_LIST L " \
              "WHERE 1=1 AND T.INDIC_KEY = CONCAT(L.TB,\'_\',L.TYPE,\'_\',L.NBR)  AND L.TB = \'ZCFZ\'  " \
              "AND T.CURR_CD =\'HRMB\'  AND L.TB = \'ZCFZ\'  AND L.TYPE = \'A\'  AND L.NBR < \'127\' " \
              "AND T.STAT_DT <= DATE(" + p_stat_dt + ")  " \
              "AND T.ORG_NUM = " + p_org + " " \
-             "AND T.CURR_CD = " + p_curr_cd + "  " \
+             "AND T.CURR_CD = " + p_curr_cd + " AND T.PERIOD = " + p_peroid + " " \
              "ORDER BY STAT_DT,INDIC_KEY "
 
 # 通过pandas读取 机构数据
