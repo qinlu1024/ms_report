@@ -310,21 +310,22 @@ sql_jg_scatter = "SELECT  T.INDIC_KEY, T.ORG_NUM, ROUND(T.IND_VAL/100000000,2) I
                  "AND T.PERIOD = \'Q\' AND T.CURR_CD = \'HRMB\'  AND T.ORG_LEVEL = \'3\'  " \
                  "AND T.INDIC_KEY IN (\'ZCFZ_A_113\',\'ZCFZ_B_208\') "
 
-data_lr_fb = pd.read_sql(sql_jg_scatter, engine)
-pd_lr_fb = pd.pivot_table(data_lr_fb, values='IND_VAL', columns='INDIC_KEY', index='ORG_NUM',
-                          aggfunc=np.sum, fill_value=0)
-res1 = pd_lr_fb.reset_index()
+data_fh_cdb = pd.read_sql(sql_jg_scatter, engine)
+pd_fh_cdb = pd.pivot_table(data_fh_cdb, values='IND_VAL', columns='INDIC_KEY', index='ORG_NUM',
+                           aggfunc=np.sum, fill_value=0)
+pd_fh_cdb.drop(['BSBK9X01'], inplace=True)
+res_fh_cdb = pd_fh_cdb.reset_index()
+res_fh_cdb = res_fh_cdb.replace(org_dict)
 
 
 def jg_scatter() -> Scatter:
     s = Scatter().\
-        add_xaxis(res1['ZCFZ_B_208'])\
+        add_xaxis(res_fh_cdb['ZCFZ_B_208'])\
         .add_yaxis(
         "蒙商银行",
-        [list(z) for z in zip(res1['ZCFZ_A_113'], res1['ORG_NUM'])],
+        [list(z) for z in zip(res_fh_cdb['ZCFZ_A_113'], res_fh_cdb['ORG_NUM'])],
         label_opts=opts.LabelOpts(
-            formatter=JsCode("function(params){return params.value[1] ;}"
-            )
+            formatter=JsCode("function(params){return params.value[1] ;}")
         ),
         )\
         .set_global_opts(
