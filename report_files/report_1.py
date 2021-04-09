@@ -1,10 +1,11 @@
 import pandas as pd
 import numpy as np
 from sqlalchemy import create_engine
-from pyecharts.charts import Bar, Grid, Line, Liquid, Page, Pie, Timeline
+from pyecharts.charts import Bar, Grid, Line, Liquid, Scatter, Page, Pie, Timeline
 from pyecharts.components import Table
 from pyecharts.options import ComponentTitleOpts
 from pyecharts import options as opts
+from pyecharts.commons.utils import JsCode
 
 # 数据库配置：
 # 用户名
@@ -31,13 +32,14 @@ org_dict = {'BSBK0002': '总行营业部', 'BSBK9901': '包头分行', 'BSBK9902
             'BSBK9916': '阿拉善分行', 'BSBK9918': '满洲里分行', 'BSBK9919': '二连浩特分行分行', 'BSBK9999': '蒙商银行汇总',
             'BSBK0001': '清算中心', 'BSBK0004': '数字银行', 'BSBKG014': '财务会计部',
             'BSBK9X03': '金融市场部汇总', 'BSBK9X04': '信用卡部汇总'}
+
 # 资产负债
 sql_fz_1 = "SELECT X.INDIC_KEY, X.INDIC_NAME, GEN_CHAR_DATE(X.STAT_DT) STAT_DT, " \
            "ROUND(X.IND_VAL/10000,2) IND_VAL FROM t09_rm_indic X " \
            "WHERE 1=1  AND X.INDIC_TYPE = \'1\' " \
-           "AND X.STAT_DT <= DATE(\'2021-03-31\')  " \
+           "AND X.STAT_DT IN (DATE(\'2020-12-31\'),DATE(\'2021-03-31\')) " \
            "AND X.ORG_NUM = " + p_org + " AND X.CURR_CD = " + p_curr_cd + " " \
-            "AND X.PERIOD = " + p_peroid + " " \
+            "AND X.PERIOD = \'M\' " \
             "ORDER BY STAT_DT,INDIC_KEY "
 # 利润
 sql_fz_2 = "SELECT X.INDIC_KEY, X.INDIC_NAME, GEN_CHAR_DATE(X.STAT_DT) STAT_DT, " \
@@ -47,7 +49,6 @@ sql_fz_2 = "SELECT X.INDIC_KEY, X.INDIC_NAME, GEN_CHAR_DATE(X.STAT_DT) STAT_DT, 
            "AND X.ORG_NUM = " + p_org + " " \
            "AND X.CURR_CD = " + p_curr_cd + "  AND X.PERIOD = \'Q\' " \
            "ORDER BY STAT_DT,INDIC_KEY "
-
 # 衍生基础数据SQL
 sql_fz_3 = "SELECT X.DISPLAY_SEQ AS INDIC_KEY, X.INDIC_NAME, GEN_CHAR_DATE(X.STAT_DT) STAT_DT, X.IND_VAL " \
            "FROM V_09_RM_REPORT_SHOP X " \
@@ -57,7 +58,7 @@ sql_fz_3 = "SELECT X.DISPLAY_SEQ AS INDIC_KEY, X.INDIC_NAME, GEN_CHAR_DATE(X.STA
            "ORDER BY STAT_DT,INDIC_KEY "
 
 sql_indic_map = "SELECT CONCAT(L.TB,\'_\',L.TYPE,\'_\',L.NBR) AS INDIC_KEY,L.INDIC_NAME FROM t00_indic_list L " \
-                "WHERE 1=1  AND TB=\'ZCFZ\'  AND IS_DISPLAY = \'1\'  ORDER BY DISPLAY_SEQ    "
+                "WHERE 1=1  "
 
 sql_fz_jg = " SELECT T.INDIC_KEY, T.STAT_DT, ROUND(T.IND_VAL/10000,2) IND_VAL FROM T09_RM_INDIC T,T00_INDIC_LIST L " \
              "WHERE 1=1 AND T.INDIC_KEY = CONCAT(L.TB,\'_\',L.TYPE,\'_\',L.NBR)  AND L.TB = \'ZCFZ\'  " \
@@ -66,6 +67,7 @@ sql_fz_jg = " SELECT T.INDIC_KEY, T.STAT_DT, ROUND(T.IND_VAL/10000,2) IND_VAL FR
              "AND T.ORG_NUM = " + p_org + " " \
              "AND T.CURR_CD = " + p_curr_cd + " AND T.PERIOD = " + p_peroid + " " \
              "ORDER BY STAT_DT,INDIC_KEY "
+
 sql_fz_jg_2 = " SELECT T.INDIC_KEY, T.STAT_DT, ROUND(T.IND_VAL/10000,2) IND_VAL FROM T09_RM_INDIC T,T00_INDIC_LIST L " \
              "WHERE 1=1 AND T.INDIC_KEY = CONCAT(L.TB,\'_\',L.TYPE,\'_\',L.NBR)  AND L.TB = \'ZCFZ\'  " \
              "AND T.CURR_CD =\'HRMB\'  AND L.TB = \'ZCFZ\'  AND L.TYPE = \'B\'  AND L.NBR < \'217\' " \
@@ -82,6 +84,7 @@ data_fz_jg_22 = pd.read_sql(sql_fz_jg_2, engine)
 
 data_map = pd.read_sql(sql_indic_map, engine, index_col='INDIC_KEY')
 data_dict = data_map.to_dict()['INDIC_NAME']
+
 # 透视表
 pd_exp_fz_1 = pd.pivot_table(data_fz_1, values='IND_VAL', index=['INDIC_KEY', 'INDIC_NAME'], columns='STAT_DT',
                              aggfunc=np.sum, fill_value=0)
@@ -94,14 +97,14 @@ pd_exp_fz_jg = pd.pivot_table(data_fz_jg, values='IND_VAL', index='INDIC_KEY', c
 headers_jg = pd_exp_fz_jg.columns.tolist()
 pd_exp_fz_jg_22 = pd.pivot_table(data_fz_jg_22, values='IND_VAL', index='INDIC_KEY', columns='STAT_DT',
                                  aggfunc=np.sum, fill_value=0)
-# headers_jg_22 = pd_exp_fz_jg_22.columns.tolist()
-# print(headers_jg)
+
 # 重置索引
 pd_exp_fz_p1 = pd_exp_fz_1.reset_index()
 pd_exp_fz_p2 = pd_exp_fz_2.reset_index()
 pd_exp_fz_p3 = pd_exp_fz_3.reset_index()
 
 # 增减值
+# print(pd_exp_fz_p1)
 pd_exp_fz_p1['增减值'] = pd_exp_fz_p1['2021-03-31'] - pd_exp_fz_p1['2020-12-31']
 pd_exp_fz_tb = pd_exp_fz_p1[['INDIC_KEY', 'INDIC_NAME', '2020-12-31', '2021-03-31', '增减值']]
 # 增减幅
@@ -123,14 +126,13 @@ def table_base_zc() -> Table:
     for i in rs_1.columns.tolist():
         headers.append(i)
 
-    numsList = []
+    show_list = []
     for row in rs_1.round(2).itertuples():
-        # print(row)
-        numsList.append([row[1], row[2], row[3], row[4], row[5]])
+        show_list.append([row[1], row[2], row[3], row[4], row[5]])
     # print(numsList)
 
     table_zc = Table()
-    table_zc.add(headers, numsList)
+    table_zc.add(headers, show_list)
     table_zc.set_global_opts(
         title_opts=ComponentTitleOpts(title="资产负债表", subtitle="（单位:万元  粒度:季度  币种:HRMB）")
     )
@@ -142,14 +144,14 @@ def table_base_lr() -> Table:
     for i in rs_2.columns.tolist():
         headers.append(i)
 
-    numsList = []
+    show_list = []
     for row in rs_2.round(2).itertuples():
         # print(row)
-        numsList.append([row[1], row[2]])
+        show_list.append([row[1], row[2]])
     # print(numsList)
 
     table_lr = Table()
-    table_lr.add(headers, numsList)
+    table_lr.add(headers, show_list)
     table_lr.set_global_opts(
         title_opts=ComponentTitleOpts(title="利润表", subtitle="（单位:万元  粒度:季度  币种:HRMB）")
     )
@@ -164,7 +166,7 @@ def jg_timeline() -> Timeline:
         # 初始化配置项
         init_opts=opts.InitOpts(
             width='1220px',
-            height='900px',
+            height='800px',
         )
     )
     for it in headers_jg:
@@ -189,10 +191,9 @@ def jg_timeline() -> Timeline:
                 # 提示框组件配置项，参考 `series_options.TooltipOpts`
                 # tooltip_opts= Union[opts.TooltipOpts, dict, None] = None,
             )
-                .set_global_opts(title_opts=opts.TitleOpts("蒙商银行资产结构情况："),
-                                 legend_opts=opts.LegendOpts(orient="vertical", pos_top="15%", pos_left="2%"))
-
-                .set_series_opts(label_opts=opts.LabelOpts(formatter="{b}: {d}%"))
+            .set_global_opts(title_opts=opts.TitleOpts("蒙商银行资产结构情况："),
+                             legend_opts=opts.LegendOpts(orient="vertical", pos_top="15%", pos_left="2%"))
+            .set_series_opts(label_opts=opts.LabelOpts(formatter="{b}: {d}%"))
         )
         tl.add(pie, "{}".format(it))
     return tl
@@ -206,7 +207,7 @@ def jg_timeline2() -> Timeline:
         # 初始化配置项
         init_opts=opts.InitOpts(
             width='1220px',
-            height='900px',
+            height='800px',
         )
     )
     for it in headers_jg:
@@ -231,13 +232,213 @@ def jg_timeline2() -> Timeline:
                 # 提示框组件配置项，参考 `series_options.TooltipOpts`
                 # tooltip_opts= Union[opts.TooltipOpts, dict, None] = None,
             )
-                .set_global_opts(title_opts=opts.TitleOpts("蒙商银行负债结构情况："),
-                                 legend_opts=opts.LegendOpts(orient="vertical", pos_top="15%", pos_left="2%"))
-
-                .set_series_opts(label_opts=opts.LabelOpts(formatter="{b}: {d}%"))
+            .set_global_opts(title_opts=opts.TitleOpts("蒙商银行负债结构情况："),
+                             legend_opts=opts.LegendOpts(orient="vertical", pos_top="15%", pos_left="2%"))
+            .set_series_opts(label_opts=opts.LabelOpts(formatter="{b}: {d}%"))
         )
         tl.add(pie, "{}".format(it))
     return tl
+
+
+# 主要业务发展-趋势
+sql_fz_ys = " SELECT T.INDIC_KEY, GEN_CHAR_DATE(T.STAT_DT) STAT_DT, ROUND(T.IND_VAL/10000,2) IND_VAL " \
+            "FROM v_09_rm_report_shop T " \
+             "WHERE 1=1  " \
+             "AND T.CURR_CD =\'HRMB\'  AND T.FORMAT = 'WY'  AND T.PERIOD = \'M\'  " \
+             "AND T.STAT_DT <= DATE(" + p_stat_dt + ")  " \
+             "AND T.ORG_NUM = " + p_org + " " \
+             "AND T.CURR_CD = " + p_curr_cd + "  " \
+             "ORDER BY STAT_DT,INDIC_KEY "
+
+data_fz_ys = pd.read_sql(sql_fz_ys, engine)
+pd_exp_fz_ys = pd.pivot_table(data_fz_ys, values='IND_VAL', index='INDIC_KEY', columns='STAT_DT',
+                              aggfunc=np.sum, fill_value=0)
+headers = pd_exp_fz_ys.columns.tolist()
+res_1 = pd_exp_fz_ys.reset_index()
+res_1 = res_1.replace(data_dict)
+
+
+def business_fz() -> Line:
+    ln = Line(
+        init_opts=opts.InitOpts(
+            width='1220px',
+            height='760px',
+        )
+    )
+    ln.add_xaxis(headers)
+    for row in res_1.index:
+        ln.add_yaxis(res_1.iloc[row, 0], res_1.iloc[row, 1:].tolist())
+    ln.set_global_opts(title_opts=opts.TitleOpts(title="业务量发展趋势"))
+    return ln
+
+
+sql_lr_fb = " SELECT  T.INDIC_KEY, T.ORG_NUM, ROUND(T.IND_VAL/100000000,2) IND_VAL FROM t09_rm_indic T  " \
+            "WHERE 1=1 AND T.STAT_DT = DATE(\'2021-03-31\')  " \
+            "AND T.PERIOD = \'Q\' AND T.CURR_CD = \'HRMB\'  AND T.ORG_NUM IN (SELECT ORG_NUM FROM T09_REPORT_ORG)  " \
+            "AND T.INDIC_KEY IN (\'ZCFZ_A_113\',\'ZCFZ_B_208\') "
+
+data_lr_fb = pd.read_sql(sql_lr_fb, engine)
+data_lr_fb_p = pd.pivot_table(data_lr_fb, values='IND_VAL', index='ORG_NUM', columns='INDIC_KEY',
+                              aggfunc=np.sum, fill_value=0)
+data_lr_fb_p.drop(['BSBK9999'], inplace=True)
+data_lr_fb_p = data_lr_fb_p.reset_index()
+data_lr_fb_p = data_lr_fb_p.replace(org_dict)
+
+
+def fh_jg() -> Pie:
+    p = Pie(
+        init_opts=opts.InitOpts(
+            width='1500px',
+            height='760px',
+        )
+    ).add("",
+          [list(z) for z in zip(data_lr_fb_p['ORG_NUM'], data_lr_fb_p['ZCFZ_A_113'])],
+          radius=["1%", "60%"],
+          center=["35%", "50%"]
+          )\
+         .add("", [list(z) for z in zip(data_lr_fb_p['ORG_NUM'], data_lr_fb_p['ZCFZ_B_208'])],
+              radius=["1%", "60%"],
+              center=["75%", "50%"])\
+         .set_global_opts(title_opts=opts.TitleOpts(title="贷款、存款分布情况", subtitle="（单位：亿元）"),
+                          legend_opts=opts.LegendOpts(orient="vertical", pos_top="15%", pos_left="2%"))\
+         .set_series_opts(label_opts=opts.LabelOpts(formatter="{d}%"))
+    return p
+
+
+sql_jg_scatter = "SELECT  T.INDIC_KEY, T.ORG_NUM, ROUND(T.IND_VAL/100000000,2) IND_VAL FROM t09_rm_indic T  " \
+                 "WHERE 1=1 AND T.STAT_DT = DATE(\'2021-03-31\')  " \
+                 "AND T.PERIOD = \'Q\' AND T.CURR_CD = \'HRMB\'  AND T.ORG_LEVEL = \'3\'  " \
+                 "AND T.INDIC_KEY IN (\'ZCFZ_A_113\',\'ZCFZ_B_208\') "
+
+data_lr_fb = pd.read_sql(sql_jg_scatter, engine)
+pd_lr_fb = pd.pivot_table(data_lr_fb, values='IND_VAL', columns='INDIC_KEY', index='ORG_NUM',
+                          aggfunc=np.sum, fill_value=0)
+res1 = pd_lr_fb.reset_index()
+
+
+def jg_scatter() -> Scatter:
+    s = Scatter().\
+        add_xaxis(res1['ZCFZ_B_208'])\
+        .add_yaxis(
+        "蒙商银行",
+        [list(z) for z in zip(res1['ZCFZ_A_113'], res1['ORG_NUM'])],
+        label_opts=opts.LabelOpts(
+            formatter=JsCode("function(params){return params.value[1] ;}"
+            )
+        ),
+        )\
+        .set_global_opts(
+        title_opts=opts.TitleOpts(title="各分行存款、贷款情况"),
+        tooltip_opts=opts.TooltipOpts(
+            formatter=JsCode(
+                "function (params) {return params.value[2];}"
+            )
+        ),
+        xaxis_opts=opts.AxisOpts(
+            name='存款总额',
+            name_location='center',
+            name_gap=40,
+            splitline_opts=opts.SplitLineOpts(is_show=True)
+        ),
+        yaxis_opts=opts.AxisOpts(
+            name='贷款总额',
+            name_location='center',
+            name_gap=40,
+            splitline_opts=opts.SplitLineOpts(is_show=True)
+        )
+    )
+    return s
+
+
+sql_lr_fy = " SELECT  T.INDIC_KEY, T.ORG_NUM, ROUND(T.IND_VAL/10000,2) IND_VAL FROM t09_rm_indic T  " \
+            "WHERE 1=1 AND T.STAT_DT = DATE(\'2021-03-31\')  " \
+            "AND T.PERIOD = \'Q\' AND T.CURR_CD = \'HRMB\'  " \
+            "AND T.ORG_NUM IN (SELECT ORG_NUM FROM T09_REPORT_ORG)  " \
+            "AND T.INDIC_KEY IN (\'LR_A_101\',\'LR_B_114\',\'LR_E_124\') "
+
+data_lr_fy = pd.read_sql(sql_lr_fy, engine)
+data_lr_fy_p = pd.pivot_table(data_lr_fy, values='IND_VAL', index='ORG_NUM', columns='INDIC_KEY',
+                              aggfunc=np.sum, fill_value=0)
+data_lr_fy_p.drop(['BSBK9999'], inplace=True)
+res_lr_fy = data_lr_fy_p.reset_index()
+res_lr_fy = res_lr_fy.replace(org_dict)
+
+
+def lr_fh_bar() -> Bar():
+    bar = Bar(
+        init_opts=opts.InitOpts(
+            width='1600px',
+            height='760px',
+        )
+    ).add_xaxis(res_lr_fy['ORG_NUM'].tolist())\
+        .add_yaxis("营业收入", res_lr_fy['LR_A_101'].tolist())\
+        .add_yaxis("营业支出", res_lr_fy['LR_B_114'].tolist())\
+        .add_yaxis("净利润", res_lr_fy['LR_E_124'].tolist())\
+        .set_global_opts(
+        xaxis_opts=opts.AxisOpts(axislabel_opts=opts.LabelOpts(rotate=-15)),
+        title_opts=opts.TitleOpts(title="各家分行利润分布情况", subtitle="金额：万元"),
+    )
+    return bar
+
+
+sql_fz_loan = " SELECT T.GL_ACCT_NAME, GEN_CHAR_DATE(T.STAT_DT) STAT_DT, ROUND(T.DR_BAL/10000,2) IND_VAL " \
+              " FROM v_ywzk_tmp T WHERE 1=1  " \
+              " AND T.STAT_DT <= DATE(" + p_stat_dt + ") " \
+              " AND T.PERIOD = "+p_peroid+" " \
+              " AND T.CURR_CD = " + p_curr_cd + " " \
+              " AND T.ORG_NUM = " + p_org + " " \
+              " AND T.GL_ACCT_LEVEL = \'1\' " \
+              " AND LEFT(T.GL_ACCT,2) = \'12\' " \
+              " AND T.CR_BAL = 0 "
+data_fz_loan = pd.read_sql(sql_fz_loan, engine)
+pd_exp_fz_loan = pd.pivot_table(data_fz_loan, values='IND_VAL', index='GL_ACCT_NAME', columns='STAT_DT',
+                                aggfunc=np.sum, fill_value=0)
+headers_loan = pd_exp_fz_loan.columns.tolist()
+res_fz_loan = pd_exp_fz_loan.reset_index()
+
+
+def fh_daikuan_qs() -> Line():
+    ln = Line(
+        init_opts=opts.InitOpts(
+            width='1220px',
+            height='760px',
+        )
+    )
+    ln.add_xaxis(headers_loan)
+    for row in res_fz_loan.index:
+        ln.add_yaxis(res_fz_loan.iloc[row, 0], res_fz_loan.iloc[row, 1:].tolist())
+    ln.set_global_opts(title_opts=opts.TitleOpts(title="贷款产品发展趋势"))
+    return ln
+
+
+sql_fz_deb = " SELECT T.GL_ACCT_NAME, GEN_CHAR_DATE(T.STAT_DT) STAT_DT, ROUND(T.CR_BAL/10000,2) IND_VAL " \
+              " FROM v_ywzk_tmp T WHERE 1=1  " \
+              " AND T.STAT_DT <= DATE(" + p_stat_dt + ") " \
+              " AND T.PERIOD = "+p_peroid+" " \
+              " AND T.CURR_CD = " + p_curr_cd + " " \
+              " AND T.ORG_NUM = " + p_org + " " \
+              " AND T.GL_ACCT_LEVEL = \'1\' " \
+              " AND LEFT(T.GL_ACCT,2) = \'22\' " \
+              " AND T.DR_BAL = 0 "
+data_fz_deb = pd.read_sql(sql_fz_deb, engine)
+pd_exp_fz_deb = pd.pivot_table(data_fz_deb, values='IND_VAL', index='GL_ACCT_NAME', columns='STAT_DT',
+                               aggfunc=np.sum, fill_value=0)
+headers_fz_deb = pd_exp_fz_deb.columns.tolist()
+res_fz_deb = pd_exp_fz_deb.reset_index()
+
+
+def cp_jg() -> Line():
+    ln = Line(
+        init_opts=opts.InitOpts(
+            width='1220px',
+            height='760px',
+        )
+    )
+    ln.add_xaxis(headers_fz_deb)
+    for row in res_fz_deb.index:
+        ln.add_yaxis(res_fz_deb.iloc[row, 0], res_fz_deb.iloc[row, 1:].tolist())
+    ln.set_global_opts(title_opts=opts.TitleOpts(title="存款产品发展趋势"))
+    return ln
 
 
 def page_simple_layout():
@@ -250,8 +451,14 @@ def page_simple_layout():
         # liquid_data_precision(),
         table_base_zc(),
         table_base_lr(),
+        jg_scatter(),
+        business_fz(),
         jg_timeline(),
         jg_timeline2(),
+        fh_daikuan_qs(),
+        cp_jg(),
+        fh_jg(),
+        lr_fh_bar(),
     )
     page.render("page_simple_layout.html")
 

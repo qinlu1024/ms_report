@@ -1,6 +1,3 @@
-from pyecharts import options as opts
-from pyecharts.charts import Pie, Timeline
-from pyecharts.faker import Faker
 import pandas as pd
 import numpy as np
 from sqlalchemy import create_engine

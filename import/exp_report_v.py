@@ -18,7 +18,7 @@ engine = create_engine(f'mysql+pymysql://{db_user}:{db_password}@{db_host}:{db_p
 # 报表基础参数
 p_stat_dt = "\'2021-03-31\'"
 p_curr_cd = "\'HRMB\'"
-p_peroid = "\'Q\'"
+p_peroid = "\'M\'"
 p_org = "\'BSBK9999\'"
 
 org_dict = {'BSBK0002': '总行营业部', 'BSBK9901': '包头分行', 'BSBK9902': '赤峰分行', 'BSBK9903': '巴彦淖尔分行',
