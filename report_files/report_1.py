@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 from sqlalchemy import create_engine
-from pyecharts.charts import Bar, Grid, Line, Liquid, Scatter, Page, Pie, Timeline
+from pyecharts.charts import Bar, Line, Scatter, Page, Pie, Timeline
 from pyecharts.components import Table
 from pyecharts.options import ComponentTitleOpts
 from pyecharts import options as opts
@@ -122,17 +122,16 @@ rs_2 = tb_2[['科目', '2021-03-31']]
 
 
 def table_base_zc() -> Table:
-    headers = []
+    header = []
     for i in rs_1.columns.tolist():
-        headers.append(i)
+        header.append(i)
 
     show_list = []
     for row in rs_1.round(2).itertuples():
         show_list.append([row[1], row[2], row[3], row[4], row[5]])
-    # print(numsList)
 
     table_zc = Table()
-    table_zc.add(headers, show_list)
+    table_zc.add(header, show_list)
     table_zc.set_global_opts(
         title_opts=ComponentTitleOpts(title="资产负债表", subtitle="（单位:万元  粒度:季度  币种:HRMB）")
     )
