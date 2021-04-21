@@ -106,8 +106,8 @@ pd_exp_ys = pd_exp_ys.rename(columns=org_dict)
 # pd_exp_ys.to_excel('D:\\test\\衍生表' + p_stat_dt + '.xls', sheet_name='利润表', na_rep=0, float_format="%.2f")
 
 # print('---------------------------- excel输出 ----------------------------------------------------------------')
-with pd.ExcelWriter('D:\\test\\各分行季度横向_('+p_stat_dt[1:11]+').xlsx') as writer:
-    pd_exp_ys.to_excel(writer, sheet_name='衍生指标', na_rep=0, float_format="%.2f")
+with pd.ExcelWriter('D:\\test\\各分行jj度横向_('+p_stat_dt[1:11]+').xlsx') as writer:
+    pd_exp_ys.to_excel(writer, sheet_name='衍生指标', na_rep=0, float_format="%.4f")
     pd_exp_zcfz.to_excel(writer, sheet_name='资产负债', na_rep=0, float_format="%.2f")
-    pd_exp_lr.to_excel(writer, sheet_name='利润表', na_rep=0, float_format="%.4f")
+    pd_exp_lr.to_excel(writer, sheet_name='利润表', na_rep=0, float_format="%.2f")
 #    pd_exp_ywzk.to_excel(writer, sheet_name='业务状况表', na_rep=0, float_format="%.2f")

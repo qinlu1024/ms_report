@@ -4,8 +4,8 @@ from sqlalchemy import create_engine
 
 # 参数
 # 报表路径、Sheet页名称
-p_report_path = 'D:\\test\\T149_FDM_F_PROD_ACC_BAL.xls'
-p_report_sheet_name = 'T149_FDM_F_PROD_ACC_BAL'
+p_report_path = 'D:\\Data_File\\FDM_F_PROD_ACC_BAL.xls'
+p_report_sheet_name = 'FDM_F_PROD_ACC_BAL'
 p_period = 'M'
 # p_curr_cd = 'HRMB'
 # 数据库用户名
@@ -46,6 +46,5 @@ des_df = prod_df.loc[:, ['SN', 'ID', 'PROD_CD', 'CALC_UNIT_ID', 'GL_ACC_ID', 'OP
                          'CUR_DR_BAL_AMT', 'CUR_CR_BAL_AMT',
                          'LOAD_DT', 'EFF_BGN_DT', 'EFF_END_DT', 'EFF_FLG', 'ETL_DATE']]
 # load data
-des_df.to_sql('t00_fdm_f_prod_acc_bal', engine,
-              if_exists='append', index=False)
+des_df.to_sql('t00_fdm_f_prod_acc_bal', engine, if_exists='append', index=False)
 print('*'*30 + '  Complete data import !!   ' + '*'*30)

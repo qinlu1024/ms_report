@@ -19,7 +19,7 @@ engine = create_engine(f'mysql+pymysql://{db_user}:{db_password}@{db_host}:{db_p
 p_stat_dt = "\'2021-03-31\'"
 p_curr_cd = "\'HRMB\'"
 p_peroid = "\'M\'"
-p_org = "\'BSBK9999\'"
+p_org = "\'BSBK9909\'"
 
 org_dict = {'BSBK0002': '总行营业部', 'BSBK9901': '包头分行', 'BSBK9902': '赤峰分行', 'BSBK9903': '巴彦淖尔分行',
             'BSBK9904': '通辽分行', 'BSBK9906': '鄂尔多斯分行', 'BSBK9907': '锡林郭勒分行', 'BSBK9909': '呼伦贝尔分行',
@@ -40,7 +40,8 @@ sql_fz_2 = "SELECT X.INDIC_KEY, X.INDIC_NAME, X.STAT_DT, ROUND(X.IND_VAL/10000,2
          "AND X.ORG_NUM = "+p_org + " " \
          "AND X.CURR_CD = " + p_curr_cd + "  AND X.PERIOD = " + p_peroid + " " \
          "ORDER BY STAT_DT,INDIC_KEY "
-sql_fz_3 = "SELECT X.DISPLAY_SEQ AS INDIC_KEY, X.INDIC_NAME, X.STAT_DT, X.IND_VAL FROM V_09_RM_REPORT_SHOP X " \
+sql_fz_3 = "SELECT X.DISPLAY_SEQ AS INDIC_KEY, X.INDIC_NAME, X.STAT_DT, X.IND_VAL " \
+           "FROM V_09_RM_REPORT_SHOP X " \
          "WHERE X.STAT_DT <= DATE("+p_stat_dt+")  " \
          "AND X.ORG_NUM = "+p_org + " " \
          "AND X.CURR_CD = " + p_curr_cd + "  AND X.PERIOD = " + p_peroid + " " \
@@ -65,7 +66,7 @@ pd_exp_fz_3 = pd.pivot_table(data_fz_3, values='IND_VAL', index=['指标ID', '�
 # pd_exp_fz_3['均值'] = pd_exp_fz_3.mean(axis=1)
 
 print('---------------------------- excel输出 ----------------------------------------------------------------')
-with pd.ExcelWriter('D:\\test\\'+org_dict.get(p_org[1:9])+'_'+p_stat_dt[1:11]+'季度纵向.xlsx') as writer:
-    pd_exp_fz_3.to_excel(writer, sheet_name='衍生指标', na_rep='0', float_format="%.2f")
+with pd.ExcelWriter('D:\\test\\'+org_dict.get(p_org[1:9])+'_'+p_stat_dt[1:11]+'包头M度纵向.xlsx') as writer:
+    pd_exp_fz_3.to_excel(writer, sheet_name='衍生指标', na_rep='0', float_format="%.4f")
     pd_exp_fz_1.to_excel(writer, sheet_name='资产负债', na_rep='0', float_format="%.2f")
     pd_exp_fz_2.to_excel(writer, sheet_name='利润', na_rep='0', float_format="%.2f")

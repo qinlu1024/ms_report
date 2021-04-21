@@ -267,7 +267,7 @@ def business_fz() -> Line:
     ln.add_xaxis(headers)
     for row in res_1.index:
         ln.add_yaxis(res_1.iloc[row, 0], res_1.iloc[row, 1:].tolist())
-    ln.set_global_opts(title_opts=opts.TitleOpts(title="业务量发展趋势"))
+    ln.set_global_opts(title_opts=opts.TitleOpts(title="业务量发展趋势", subtitle="（单位:亿元）"))
     return ln
 
 
@@ -306,13 +306,14 @@ def fh_jg() -> Pie:
 
 sql_jg_scatter = "SELECT  T.INDIC_KEY, T.ORG_NUM, ROUND(T.IND_VAL/100000000,2) IND_VAL FROM t09_rm_indic T  " \
                  "WHERE 1=1 AND T.STAT_DT = DATE(\'2021-03-31\')  " \
-                 "AND T.PERIOD = \'Q\' AND T.CURR_CD = \'HRMB\'  AND T.ORG_LEVEL = \'3\'  " \
+                 "AND T.PERIOD = \'Q\' AND T.CURR_CD = \'HRMB\'  " \
+                 "AND T.ORG_NUM IN (SELECT ORG_NUM FROM T09_REPORT_ORG) " \
                  "AND T.INDIC_KEY IN (\'ZCFZ_A_113\',\'ZCFZ_B_208\') "
 
 data_fh_cdb = pd.read_sql(sql_jg_scatter, engine)
 pd_fh_cdb = pd.pivot_table(data_fh_cdb, values='IND_VAL', columns='INDIC_KEY', index='ORG_NUM',
                            aggfunc=np.sum, fill_value=0)
-pd_fh_cdb.drop(['BSBK9X01'], inplace=True)
+pd_fh_cdb.drop(['BSBK9999'], inplace=True)
 res_fh_cdb = pd_fh_cdb.reset_index()
 res_fh_cdb = res_fh_cdb.replace(org_dict)
 
@@ -327,8 +328,13 @@ def jg_scatter() -> Scatter:
             formatter=JsCode("function(params){return params.value[1] ;}")
         ),
         )\
+        .add_yaxis(
+        "存贷比参考值",
+        [list(z) for z in zip(res_fh_cdb['ZCFZ_B_208']*0.75, res_fh_cdb['ORG_NUM'])],
+        label_opts=opts.LabelOpts(is_show=False)
+        )\
         .set_global_opts(
-        title_opts=opts.TitleOpts(title="各分行存款、贷款情况"),
+        title_opts=opts.TitleOpts(title="2021年一季度各分行存款、贷款情况", subtitle="（单位:亿元）"),
         tooltip_opts=opts.TooltipOpts(
             formatter=JsCode(
                 "function (params) {return params.value[2];}"
@@ -376,7 +382,7 @@ def lr_fh_bar() -> Bar():
         .add_yaxis("净利润", res_lr_fy['LR_E_124'].tolist())\
         .set_global_opts(
         xaxis_opts=opts.AxisOpts(axislabel_opts=opts.LabelOpts(rotate=-15)),
-        title_opts=opts.TitleOpts(title="各家分行利润分布情况", subtitle="金额：万元"),
+        title_opts=opts.TitleOpts(title="一季度各家分行利润分布情况", subtitle="金额：万元"),
     )
     return bar
 
@@ -407,7 +413,7 @@ def fh_daikuan_qs() -> Line():
     ln.add_xaxis(headers_loan)
     for row in res_fz_loan.index:
         ln.add_yaxis(res_fz_loan.iloc[row, 0], res_fz_loan.iloc[row, 1:].tolist())
-    ln.set_global_opts(title_opts=opts.TitleOpts(title="贷款产品发展趋势"))
+    ln.set_global_opts(title_opts=opts.TitleOpts(title="贷款产品发展趋势", subtitle="（单位:万元）"))
     return ln
 
 
@@ -437,7 +443,7 @@ def cp_jg() -> Line():
     ln.add_xaxis(headers_fz_deb)
     for row in res_fz_deb.index:
         ln.add_yaxis(res_fz_deb.iloc[row, 0], res_fz_deb.iloc[row, 1:].tolist())
-    ln.set_global_opts(title_opts=opts.TitleOpts(title="存款产品发展趋势"))
+    ln.set_global_opts(title_opts=opts.TitleOpts(title="存款产品发展趋势", subtitle="（单位:万元）"))
     return ln
 
 

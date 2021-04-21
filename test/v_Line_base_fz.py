@@ -35,7 +35,7 @@ sql_fz_deb = " SELECT T.GL_ACCT_NAME, GEN_CHAR_DATE(T.STAT_DT) STAT_DT, ROUND(T.
               " AND T.DR_BAL = 0 "
 data_fz_deb = pd.read_sql(sql_fz_deb, engine)
 pd_exp_fz_deb = pd.pivot_table(data_fz_deb, values='IND_VAL', index='GL_ACCT_NAME', columns='STAT_DT',
-                              aggfunc=np.sum, fill_value=0)
+                               aggfunc=np.sum, fill_value=0)
 headers = pd_exp_fz_deb.columns.tolist()
 res_1 = pd_exp_fz_deb.reset_index()
 
