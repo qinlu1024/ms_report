@@ -18,15 +18,32 @@ db_name = 'regular_monitoring'
 engine = create_engine(f'mysql+pymysql://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}', echo=True)
 
 # data
-sql_data_1 = "SELECT V.STAT_DT, V.GL_ACCT, V.ORG_NUM, V.V FROM V_TEST_1 V WHERE V.STAT_DT = DATE(\'2021-03-31\')"
+sql_data_1 = "SELECT T.INDIC_KEY,T.INDIC_NAME,T.STAT_DT,T.IND_VAL " \
+             "FROM t09_rm_indic T WHERE 1=1 " \
+             "AND T.CURR_CD = \'HRMB\' " \
+             "AND T.PERIOD = \'M\' " \
+             "AND T.INDIC_TYPE = \'3\' " \
+             "AND T.INDIC_KEY =\'YS_JG_164\' " \
+             "AND EXISTS(SELECT 1 FROM t09_gl_subj_month M WHERE T.ORG_NUM = M.OP_ORG_NUM) "
 res_data_1 = pd.read_sql(sql_data_1, engine)
-
-pd_exp_fz_ys = pd.pivot_table(res_data_1, values='V', index='ORG_NUM', columns='GL_ACCT',
+# pd_exp_fz_ys = pd.pivot_table(res_data_1, values='IND_VAL', index='ORG_NUM', columns='STAT_DT',
+#                               aggfunc=np.sum, fill_value=0)
+# pd_exp_fz_ys = pd_exp_fz_ys.reset_index()
+print(res_data_1)
+'''
+pd_exp_fz_ys = pd.pivot_table(res_data_1, values='V', index='ORG_NUM', columns='STAT_DT',
                               aggfunc=np.sum, fill_value=0)
 pd_exp_fz_ys = pd_exp_fz_ys.reset_index()
 pd_exp_fz_ys.drop(['ORG_NUM'], axis=1, inplace=True)
 # print(pd_exp_fz_ys.info)
 pd_exp_fz_ys = pd_exp_fz_ys.corr()
-pd_exp_fz_ys.to_excel("path_2021-03-31.xlsx", sheet_name="Sheet1")
+pd_exp_fz_ys.to_excel("path_2021-02-28.xlsx", sheet_name="Sheet1")
 # sns.pairplot(pd_exp_fz_ys)
 # plt.show()
+'''
+
+sns.set_theme(style="darkgrid")
+sns.displot(
+    res_data_1, x='IND_VAL', col='STAT_DT'
+)
+plt.show()
