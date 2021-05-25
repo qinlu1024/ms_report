@@ -4,8 +4,8 @@ from sqlalchemy import create_engine
 
 # 参数
 # 报表路径、Sheet页名称
-p_report_path = 'D:\\Data_File\\20210331_M_ST.xls'
-p_report_sheet_name = 'GL_SUBJ_MONTH'
+p_report_path = 'D:\\Data_File\\20201130_ST.xls'
+p_report_sheet_name = 'gl_subj_month'
 p_period = 'M'
 # p_curr_cd = 'HRMB'
 # 数据库用户名
@@ -27,7 +27,6 @@ avg_df = pd.read_excel(p_report_path, sheet_name=p_report_sheet_name, dtype={'GL
                                                                              'CURR_CD': str,
                                                                              'GL_BAL_TYPE_CD': str})
 avg_df['PERIOD'] = p_period
-# print(avg_df.head())
 print('----------------------------- 1. report 格式处理 ---------------------------------------------------------------')
 # 日期\金额 转换
 avg_df['STAT_DT'] = pd.to_datetime(avg_df['STAT_DT'], format='%Y%m%d')

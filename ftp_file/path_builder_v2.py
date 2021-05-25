@@ -4,8 +4,8 @@ import pandas as pd
 # 基础参数
 os_separator = '\\'
 base_dir = 'D:\\test'
-target_dir = 'ftp'
-path_file_name = 'directory.xlsx'
+target_dir = 'ftp2'
+path_file_name = 'directory2.xlsx'
 
 path_sheet_name = 'dep'
 target_sheet_name = 'file_hier'

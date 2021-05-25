@@ -18,7 +18,7 @@ engine = create_engine(f'mysql+pymysql://{db_user}:{db_password}@{db_host}:{db_p
 # 报表基础参数
 p_stat_dt = "\'2021-03-31\'"
 p_curr_cd = "\'HRMB\'"
-p_peroid = "\'Q\'"
+p_peroid = "\'M\'"
 org_dict = {'BSBK0002': '总行营业部', 'BSBK9901': '包头分行', 'BSBK9902': '赤峰分行', 'BSBK9903': '巴彦淖尔分行',
             'BSBK9904': '通辽分行', 'BSBK9906': '鄂尔多斯分行', 'BSBK9907': '锡林郭勒分行', 'BSBK9909': '呼伦贝尔分行',
             'BSBK9911': '呼和浩特分行', 'BSBK9912': '兴安盟分行', 'BSBK9913': '乌兰察布分行', 'BSBK9915': '乌海分行',
@@ -106,7 +106,7 @@ pd_exp_ys = pd_exp_ys.rename(columns=org_dict)
 # pd_exp_ys.to_excel('D:\\test\\衍生表' + p_stat_dt + '.xls', sheet_name='利润表', na_rep=0, float_format="%.2f")
 
 # print('---------------------------- excel输出 ----------------------------------------------------------------')
-with pd.ExcelWriter('D:\\test\\各分行jj度横向_('+p_stat_dt[1:11]+').xlsx') as writer:
+with pd.ExcelWriter('D:\\test\\各分行M度横向_('+p_stat_dt[1:11]+').xlsx') as writer:
     pd_exp_ys.to_excel(writer, sheet_name='衍生指标', na_rep=0, float_format="%.4f")
     pd_exp_zcfz.to_excel(writer, sheet_name='资产负债', na_rep=0, float_format="%.2f")
     pd_exp_lr.to_excel(writer, sheet_name='利润表', na_rep=0, float_format="%.2f")

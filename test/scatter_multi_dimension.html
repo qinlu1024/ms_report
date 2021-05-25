@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Awesome-pyecharts</title>
+            <script type="text/javascript" src="https://assets.pyecharts.org/assets/echarts.min.js"></script>
+
+</head>
+<body>
+    <div id="863095e6ced84fd2903a3fc0c13dfc7a" class="chart-container" style="width:900px; height:500px;"></div>
+    <script>
+        var chart_863095e6ced84fd2903a3fc0c13dfc7a = echarts.init(
+            document.getElementById('863095e6ced84fd2903a3fc0c13dfc7a'), 'white', {renderer: 'canvas'});
+        var option_863095e6ced84fd2903a3fc0c13dfc7a = {
+    "animation": true,
+    "animationThreshold": 2000,
+    "animationDuration": 1000,
+    "animationEasing": "cubicOut",
+    "animationDelay": 0,
+    "animationDurationUpdate": 300,
+    "animationEasingUpdate": "cubicOut",
+    "animationDelayUpdate": 0,
+    "color": [
+        "#c23531",
+        "#2f4554",
+        "#61a0a8",
+        "#d48265",
+        "#749f83",
+        "#ca8622",
+        "#bda29a",
+        "#6e7074",
+        "#546570",
+        "#c4ccd3",
+        "#f05b72",
+        "#ef5b9c",
+        "#f47920",
+        "#905a3d",
+        "#fab27b",
+        "#2a5caa",
+        "#444693",
+        "#726930",
+        "#b2d235",
+        "#6d8346",
+        "#ac6767",
+        "#1d953f",
+        "#6950a1",
+        "#918597"
+    ],
+    "series": [
+        {
+            "type": "scatter",
+            "name": "\u8499\u5546\u94f6\u884c",
+            "symbolSize": 10,
+            "data": [
+                [
+                    307.71,
+                    57.58,
+                    "BSBK9901"
+                ],
+                [
+                    110.46,
+                    29.23,
+                    "BSBK9902"
+                ],
+                [
+                    36.38,
+                    22.52,
+                    "BSBK9903"
+                ],
+                [
+                    48.5,
+                    26.33,
+                    "BSBK9904"
+                ],
+                [
+                    28.32,
+                    2.39,
+                    "BSBK9906"
+                ],
+                [
+                    20.01,
+                    5.61,
+                    "BSBK9907"
+                ],
+                [
+                    26.61,
+                    15.6,
+                    "BSBK9909"
+                ],
+                [
+                    68.57,
+                    40.91,
+                    "BSBK9911"
+                ],
+                [
+                    19.86,
+                    10.88,
+                    "BSBK9912"
+                ],
+                [
+                    28.41,
+                    3.88,
+                    "BSBK9913"
+                ],
+                [
+                    18.88,
+                    6.73,
+                    "BSBK9915"
+                ],
+                [
+                    3.45,
+                    2.03,
+                    "BSBK9916"
+                ],
+                [
+                    6.94,
+                    3.09,
+                    "BSBK9918"
+                ],
+                [
+                    2.69,
+                    1.08,
+                    "BSBK9919"
+                ],
+                [
+                    267.85,
+                    166.3,
+                    "BSBK9X01"
+                ],
+                [
+                    0.54,
+                    124.0,
+                    "BSBK9X04"
+                ]
+            ],
+            "label": {
+                "show": true,
+                "position": "top",
+                "margin": 8,
+                "formatter": function(params){return params.value[1] ;}
+            }
+        }
+    ],
+    "legend": [
+        {
+            "data": [
+                "\u8499\u5546\u94f6\u884c"
+            ],
+            "selected": {
+                "\u8499\u5546\u94f6\u884c": true
+            },
+            "show": true,
+            "padding": 5,
+            "itemGap": 10,
+            "itemWidth": 25,
+            "itemHeight": 14
+        }
+    ],
+    "tooltip": {
+        "show": true,
+        "trigger": "item",
+        "triggerOn": "mousemove|click",
+        "axisPointer": {
+            "type": "line"
+        },
+        "showContent": true,
+        "alwaysShowContent": false,
+        "showDelay": 0,
+        "hideDelay": 100,
+        "formatter": function (params) {return params.value[2];},
+        "textStyle": {
+            "fontSize": 14
+        },
+        "borderWidth": 0,
+        "padding": 5
+    },
+    "xAxis": [
+        {
+            "name": "\u5b58\u6b3e\u603b\u989d",
+            "show": true,
+            "scale": false,
+            "nameLocation": "center",
+            "nameGap": 40,
+            "gridIndex": 0,
+            "inverse": false,
+            "offset": 0,
+            "splitNumber": 5,
+            "minInterval": 0,
+            "splitLine": {
+                "show": true,
+                "lineStyle": {
+                    "show": true,
+                    "width": 1,
+                    "opacity": 1,
+                    "curveness": 0,
+                    "type": "solid"
+                }
+            },
+            "data": null
+        }
+    ],
+    "yAxis": [
+        {
+            "name": "\u8d37\u6b3e\u603b\u989d",
+            "show": true,
+            "scale": false,
+            "nameLocation": "center",
+            "nameGap": 40,
+            "gridIndex": 0,
+            "inverse": false,
+            "offset": 0,
+            "splitNumber": 5,
+            "minInterval": 0,
+            "splitLine": {
+                "show": true,
+                "lineStyle": {
+                    "show": true,
+                    "width": 1,
+                    "opacity": 1,
+                    "curveness": 0,
+                    "type": "solid"
+                }
+            }
+        }
+    ],
+    "title": [
+        {
+            "text": "\u5404\u5206\u884c\u5b58\u6b3e\u3001\u8d37\u6b3e\u60c5\u51b5",
+            "padding": 5,
+            "itemGap": 10
+        }
+    ]
+};
+        chart_863095e6ced84fd2903a3fc0c13dfc7a.setOption(option_863095e6ced84fd2903a3fc0c13dfc7a);
+    </script>
+</body>
+</html>
