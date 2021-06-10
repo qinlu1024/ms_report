@@ -19,7 +19,7 @@ db_name = 'regular_monitoring'
 engine = create_engine(f'mysql+pymysql://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}', echo=True)
 
 # 报表基础参数
-p_stat_dt = "\'2021-03-31\'"
+p_stat_dt = "\'2021-05-31\'"
 p_curr_cd = "\'HRMB\'"
 p_peroid = "\'M\'"
 p_org = "\'BSBK9999\'"
@@ -47,6 +47,6 @@ ln = Line(
 )
 ln.add_xaxis(headers)
 for row in res_1.index:
-    ln.add_yaxis(res_1.iloc[row, 0], res_1.iloc[row, 1:].tolist())
+    ln.add_yaxis(res_1.iloc[row, 1], res_1.iloc[row, 1:].tolist())
 ln.set_global_opts(title_opts=opts.TitleOpts(title="存款产品发展趋势"))
 ln.render("line_base_deb.html")

@@ -19,6 +19,7 @@ engine = create_engine(f'mysql+pymysql://{db_user}:{db_password}@{db_host}:{db_p
 p_stat_dt = "\'2020-12-31\'"
 p_curr_cd = "\'HRMB\'"
 p_peroid = 'M'
+p_org = "\'BSBK9919\'"
 org_dict = {'BSBK0002': '总行营业部', 'BSBK9901': '包头分行', 'BSBK9902': '赤峰分行', 'BSBK9903': '巴彦淖尔分行',
             'BSBK9904': '通辽分行', 'BSBK9906': '鄂尔多斯分行', 'BSBK9907': '锡林郭勒分行', 'BSBK9909': '呼伦贝尔分行',
             'BSBK9911': '呼和浩特分行', 'BSBK9912': '兴安盟分行', 'BSBK9913': '乌兰察布分行', 'BSBK9915': '乌海分行',
@@ -30,7 +31,7 @@ org_dict = {'BSBK0002': '总行营业部', 'BSBK9901': '包头分行', 'BSBK9902
 sql_ywzk = "SELECT Y.GL_ACCT, Y.GL_ACCT_NAME, Y.GL_ACCT_LEVEL,	Y.CURR_CD, Y.PERIOD, Y.ORG_NUM,	" \
          " Y.LAST_D_BAL, Y.LAST_C_BAL ,Y.DR_AMT, Y.CR_AMT, Y.DR_BAL, Y.CR_BAL " \
          " FROM V_YWZK_TMP Y WHERE 1 = 1 " \
-         "AND Y.ORG_NUM IN (SELECT ORG_NUM FROM T09_REPORT_ORG) " \
+         "AND Y.ORG_NUM IN (SELECT O.ORG_NUM FROM T09_REPORT_ORG O WHERE O.ORG_LEVEL = '2' AND O.ORG_TYPE='YW') " \
          "AND Y.STAT_DT = DATE("+p_stat_dt + ") AND Y.CURR_CD = "+p_curr_cd + " AND Y.PERIOD = \'M\' "
 
 # 通过pandas读取 机构数据

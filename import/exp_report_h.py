@@ -16,7 +16,7 @@ db_name = 'regular_monitoring'
 engine = create_engine(f'mysql+pymysql://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}', echo=True)
 
 # 报表基础参数
-p_stat_dt = "\'2021-03-31\'"
+p_stat_dt = "\'2021-05-31\'"
 p_curr_cd = "\'HRMB\'"
 p_peroid = "\'M\'"
 org_dict = {'BSBK0002': '总行营业部', 'BSBK9901': '包头分行', 'BSBK9902': '赤峰分行', 'BSBK9903': '巴彦淖尔分行',
@@ -30,7 +30,7 @@ org_dict = {'BSBK0002': '总行营业部', 'BSBK9901': '包头分行', 'BSBK9902
 sql_zcfz = " SELECT L.INDIC_NAME, T.INDIC_KEY,T.ORG_NUM, ROUND(T.IND_VAL/10000,2) AS IND_VAL  " \
     " FROM t00_indic_list L LEFT JOIN t09_rm_indic T ON T.INDIC_KEY = CONCAT(L.TB, \'_\', L.TYPE, \'_\', L.NBR) " \
     " AND L.IS_DISPLAY = \'1\' AND T.STAT_DT = DATE("+p_stat_dt + ") AND T.CURR_CD = "+p_curr_cd + " " \
-    " AND T.ORG_NUM IN (SELECT ORG_NUM FROM T09_REPORT_ORG )  AND T.PERIOD = " + p_peroid + " " \
+    " AND T.ORG_NUM IN (SELECT ORG_NUM FROM T09_REPORT_ORG WHERE ORG_TYPE='YW' )  AND T.PERIOD = " + p_peroid + " " \
     " WHERE 1=1 AND L.TB = \'ZCFZ\' AND L.IS_DISPLAY = \'1\'  "\
     "ORDER BY L.DISPLAY_SEQ"
 
@@ -38,7 +38,7 @@ sql_zcfz = " SELECT L.INDIC_NAME, T.INDIC_KEY,T.ORG_NUM, ROUND(T.IND_VAL/10000,2
 sql_lr = " SELECT L.INDIC_NAME, T.INDIC_KEY,T.ORG_NUM, ROUND(T.IND_VAL/10000,2) AS INDIC_VAL  " \
     " FROM t00_indic_list L LEFT JOIN t09_rm_indic T ON T.INDIC_KEY = CONCAT(L.TB, \'_\', L.TYPE, \'_\', L.NBR) " \
     " AND L.IS_DISPLAY = \'1\' AND T.STAT_DT = DATE("+p_stat_dt + ") AND T.CURR_CD = "+p_curr_cd + " " \
-    " AND T.ORG_NUM IN (SELECT ORG_NUM FROM T09_REPORT_ORG)  AND T.PERIOD = " + p_peroid + "  " \
+    " AND T.ORG_NUM IN (SELECT ORG_NUM FROM T09_REPORT_ORG WHERE ORG_TYPE='YW' )  AND T.PERIOD = " + p_peroid + "  " \
     " WHERE 1=1 AND L.TB = \'LR\' AND L.IS_DISPLAY = \'1\'  "\
     "ORDER BY L.DISPLAY_SEQ"
 # print(sql_zcfz)
@@ -54,7 +54,7 @@ sql_ywzk = "SELECT Y.GL_ACCT, Y.GL_ACCT_NAME, Y.GL_ACCT_LEVEL,	Y.CURR_CD, Y.PERI
 sql_ys = " SELECT L.INDIC_NAME, L.DISPLAY_SEQ AS INDIC_KEY,L.ORG_NUM, L.IND_VAL  " \
     " FROM V_09_RM_REPORT_SHOP L " \
     " WHERE L.IS_DISPLAY = \'1\' AND L.STAT_DT = DATE("+p_stat_dt + ") AND L.CURR_CD = "+p_curr_cd + " " \
-    " AND L.ORG_NUM IN (SELECT ORG_NUM FROM T09_REPORT_ORG) " \
+    " AND L.ORG_NUM IN (SELECT ORG_NUM FROM T09_REPORT_ORG WHERE ORG_TYPE='YW' ) " \
     " AND L.PERIOD = " + p_peroid + "   "
 
 # 通过pandas读取 机构数据
@@ -74,7 +74,7 @@ pd_exp_zcfz = pd.pivot_table(data_zcfz, values='IND_VAL', index=['指标ID', '�
                              aggfunc=np.sum, fill_value=0)
 pd_exp_zcfz = pd_exp_zcfz[['BSBK9999', 'BSBK9901', 'BSBK9902', 'BSBK9903', 'BSBK9904', 'BSBK9906', 'BSBK9907',
                            'BSBK9909', 'BSBK9911', 'BSBK9912', 'BSBK9913', 'BSBK9915', 'BSBK9916', 'BSBK9918',
-                           'BSBK9919', 'BSBK0002', 'BSBK0001', 'BSBK0004', 'BSBKG014', 'BSBK9X03', 'BSBK9X04']]
+                           'BSBK9919', 'BSBK0002']]
 pd_exp_zcfz = pd_exp_zcfz.rename(columns=org_dict)
 # pd_exp_zcfz['均值'] = pd_exp_zcfz.mean(axis=1)
 # print('----------------------------利润输出 ----------------------------------------------------------------')
@@ -82,7 +82,7 @@ pd_exp_lr = pd.pivot_table(data_lr, values='INDIC_VAL', index=['指标ID', '指�
                            aggfunc=np.sum, fill_value=0)
 pd_exp_lr = pd_exp_lr[['BSBK9999', 'BSBK9901', 'BSBK9902', 'BSBK9903', 'BSBK9904', 'BSBK9906', 'BSBK9907',
                        'BSBK9909', 'BSBK9911', 'BSBK9912', 'BSBK9913', 'BSBK9915', 'BSBK9916', 'BSBK9918',
-                       'BSBK9919', 'BSBK0002', 'BSBK0001', 'BSBK0004', 'BSBKG014', 'BSBK9X03', 'BSBK9X04']]
+                       'BSBK9919', 'BSBK0002']]
 pd_exp_lr = pd_exp_lr.rename(columns=org_dict)
 # pd_exp_lr['均值'] = pd_exp_lr.mean(axis=1)
 '''
@@ -100,7 +100,7 @@ pd_exp_ys = pd.pivot_table(data_ys, values='IND_VAL', index=['指标ID', '指标
                            aggfunc=np.sum, fill_value=0)
 pd_exp_ys = pd_exp_ys[['BSBK9999', 'BSBK9901', 'BSBK9902', 'BSBK9903', 'BSBK9904', 'BSBK9906', 'BSBK9907',
                        'BSBK9909', 'BSBK9911', 'BSBK9912', 'BSBK9913', 'BSBK9915', 'BSBK9916', 'BSBK9918',
-                       'BSBK9919', 'BSBK0002', 'BSBK0001', 'BSBK0004', 'BSBKG014', 'BSBK9X03', 'BSBK9X04']]
+                       'BSBK9919', 'BSBK0002']]
 pd_exp_ys = pd_exp_ys.rename(columns=org_dict)
 # pd_exp_ys['均值'] = pd_exp_ys.mean(axis=1)
 # pd_exp_ys.to_excel('D:\\test\\衍生表' + p_stat_dt + '.xls', sheet_name='利润表', na_rep=0, float_format="%.2f")

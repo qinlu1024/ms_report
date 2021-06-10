@@ -4,7 +4,7 @@ from sqlalchemy import create_engine
 
 # 参数
 # 报表路径、Sheet页名称
-p_report_path = 'D:\\Data_File\\new2.0\\20210430_avg.xls'
+p_report_path = 'D:\\Data_File\\new2.0\\20210531_M_AVG.xls'
 p_report_sheet_name = 'gl_subj_month_avg'
 p_period = 'M'
 # p_curr_cd = 'HRMB'
