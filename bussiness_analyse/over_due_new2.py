@@ -23,7 +23,7 @@ org_dict = {'BSBK0002': '总行营业部', 'BSBK9901': '包头分行', 'BSBK9902
             'BSBK9X03': '金融市场部汇总', 'BSBK9X04': '信用卡部汇总'}
 col_dict = {'ACTV_MON': '放款月份', 'BHDT_BCH_CDE': '放款分行', 'PRODUCT_TYP': '产品类型', 'LOAN_TYP': '贷款类型',
             'DIS_AMT': '放款金额', 'ACT_NBR': '放款笔数', 'INT_DUE_MON': '观察月份', 'RES_AMT': '本金余额',
-            'ETL_DATE2': '观察月份', 'YQ': '逾期率'}
+            'ETL_DATE2': '观察月份', 'YQ': '逾期率', 'TRD_MON': '观察月份'}
 # ------------------------------------------- 分割线 -------------------------------------------------------------------
 sql_dis = " SELECT L.ACTV_MON,L.BHDT_BCH_CDE,L.PRODUCT_TYP,L.LOAN_TYP,L.DIS_AMT, L.ACT_NBR FROM dis_amt L "
 data_dis = pd.read_sql(sql_dis, engine)
@@ -32,12 +32,8 @@ data_dis.replace(org_dict, inplace=True)
 data_dis.rename(columns=col_dict, inplace=True)
 
 
-sql_res = " SELECT D.ACTV_MON,D.BHDT_BCH_CDE,D.ACTV_MON INT_DUE_MON,D.PRODUCT_TYP,D.LOAN_TYP,D.DIS_AMT RES_AMT " \
-          " FROM dis_amt D " \
-          " UNION " \
-          " SELECT P.ACTV_MON,P.BHDT_BCH_CDE,P.INT_DUE_MON,P.PRODUCT_TYP,P.LOAN_TYP,P.RES_AMT " \
-          " FROM PLAN_AMT P " \
-          " WHERE 1=1 AND P.INT_DUE_MON > P.ACTV_MON  "
+sql_res = " SELECT P.ACTV_MON,P.BHDT_BCH_CDE,P.TRD_MON,P.PRODUCT_TYP,P.LOAN_TYP,P.RES_AMT " \
+          " FROM PLAN_AMT_NEW P "
 data_res = pd.read_sql(sql_res, engine)
 data_res['RES_AMT'] = data_res['RES_AMT'].fillna(0)
 data_res['BHDT_BCH_CDE'] = 'BSBK99' + data_res['BHDT_BCH_CDE']
@@ -47,8 +43,8 @@ data_res_p1 = pd.pivot_table(data_res, values='本金余额', columns='观察月
 data_res_p1.rename(index=org_dict, inplace=True)
 
 
-sql_due = " SELECT D.ACTV_MON, D.ETL_DATE2 AS INT_DUE_MON, D.BHDT_BCH_CDE, D.PRODUCT_TYP, D.LOAN_TYP , D.RES_AMT " \
-          " FROM due_amt D "
+sql_due = " SELECT D.ACTV_MON, D.TRD_MON AS INT_DUE_MON, D.BHDT_BCH_CDE, D.PRODUCT_TYP, D.LOAN_TYP , D.RES_AMT " \
+          " FROM due_amt_new D "
 data_due = pd.read_sql(sql_due, engine)
 data_due['RES_AMT'] = data_due['RES_AMT'].fillna(0)
 data_due['BHDT_BCH_CDE'] = 'BSBK99' + data_due['BHDT_BCH_CDE']
@@ -70,17 +66,13 @@ data_yql.rename(columns=col_dict, inplace=True)
 data_yql_p1 = pd.pivot_table(data_yql, values='逾期率', columns='观察月份',
                              index=['放款月份', '放款分行', '产品类型', '贷款类型'], fill_value=0)
 data_yql_p1.rename(index=org_dict, inplace=True)
-'''
-sns.heatmap(data_yql_p1, cmap='YlGnBu')
-plt.rcParams['font.sans-serif'] = ['KaiTi', 'SimHei', 'FangSong']
-plt.rcParams['axes.unicode_minus'] = False
-plt.show()
+
+data_due_p3 = data_due_p1.div(data_res_p1)
 
 
-'''
 # 生成数据报表
-with pd.ExcelWriter('D:\\test\\due_list16.xlsx') as writer:
+with pd.ExcelWriter('D:\\test\\due_list15.xlsx') as writer:
     data_dis.to_excel(writer, sheet_name='放款总额', na_rep='0', float_format="%.4f")
     data_res_p1.to_excel(writer, sheet_name='还款计划本金余额', na_rep='0', float_format="%.4f")
     data_due_p1.to_excel(writer, sheet_name='逾期总额', na_rep='0', float_format="%.4f")
-    data_yql_p1.to_excel(writer, sheet_name='逾期分析', na_rep='0', float_format="%.4f")
+    data_due_p3.to_excel(writer, sheet_name='逾期分析', na_rep='0', float_format="%.4f")
