@@ -11,7 +11,7 @@ win_host = '127.0.0.1'
 # 端口号
 win_port = 3306
 # 数据库
-win_test = 'rcjc'
+win_test = 'loan'
 engine = create_engine(f'mysql+pymysql://{win_user}:{win_password}@{win_host}:{win_port}/{win_test}', echo=True)
 
 sql_v01 = "SELECT * FROM V01 "
@@ -29,6 +29,8 @@ data_v01['LOAN_TYP'].replace('零押贷(授信)', '零押贷', inplace=True)
 data_v01['LOAN_TYP'].replace('组合贷（主动授信）', None, inplace=True)
 # print(data_v01)
 print(pd.crosstab(data_v01['LOAN_TYP'], data_v01['SETL_FLG'], normalize=True, margins=True))
+
+print(pd.crosstab(data_v01['LOAN_SEC_TYP'], data_v01['LOAN_TYP'], normalize=True, margins=True))
 
 gb_v01 = data_v01.groupby('LOAN_TYP')
 
