@@ -23,7 +23,7 @@ org_dict = {'BSBK0002': '总行营业部', 'BSBK9901': '包头分行', 'BSBK9902
             'BSBK9X03': '金融市场部汇总', 'BSBK9X04': '信用卡部汇总'}
 col_dict = {'ACTV_MON': '放款月份', 'BHDT_BCH_CDE': '放款分行', 'PRODUCT_TYP': '产品类型', 'LOAN_TYP': '贷款类型',
             'DIS_AMT': '放款金额', 'ACT_NBR': '放款笔数', 'INT_DUE_MON': '观察月份', 'RES_AMT': '本金余额',
-            'ETL_DATE2': '观察月份', 'YQ': '逾期率', 'TRD_MON': '观察月份'}
+            'ETL_DATE2': '观察月份', 'YQ': '逾期率', 'TRD_MON': '观察月份', 'AGE': '年龄'}
 # ------------------------------------------- 分割线 -------------------------------------------------------------------
 sql_dis = " SELECT L.ACTV_MON,L.BHDT_BCH_CDE,L.PRODUCT_TYP,L.LOAN_TYP,L.DIS_AMT, L.ACT_NBR FROM dis_amt L "
 data_dis = pd.read_sql(sql_dis, engine)
