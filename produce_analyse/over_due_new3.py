@@ -92,7 +92,7 @@ data_yql_p2 = pd.pivot_table(data_yqbs, values='YQ', columns='TRD_MON',
 
 
 # 生成数据报表
-with pd.ExcelWriter('D:\\test\\due_list28.xlsx') as writer:
+with pd.ExcelWriter('D:\\test\\due_list228.xlsx') as writer:
     data_dis.to_excel(writer, sheet_name='放款总额', na_rep='0', float_format="%.4f")
     data_res_p1.to_excel(writer, sheet_name='还款计划本金余额', na_rep='0', float_format="%.4f")
     data_due_p1.to_excel(writer, sheet_name='逾期总额', na_rep='0', float_format="%.4f")

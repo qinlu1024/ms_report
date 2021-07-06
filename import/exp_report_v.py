@@ -16,7 +16,7 @@ db_name = 'regular_monitoring'
 engine = create_engine(f'mysql+pymysql://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}', echo=True)
 
 # 报表基础参数
-p_stat_dt = "\'2021-05-31\'"
+p_stat_dt = "\'2021-06-30\'"
 p_curr_cd = "\'HRMB\'"
 p_peroid = "\'M\'"
 p_org = "\'BSBK9999\'"
