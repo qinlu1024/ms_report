@@ -12,7 +12,7 @@ win_host = '127.0.0.1'
 # 端口号
 win_port = 3306
 # 数据库
-win_test = 'loan'
+win_test = 'loan_db'
 engine = create_engine(f'mysql+pymysql://{win_user}:{win_password}@{win_host}:{win_port}/{win_test}', echo=True)
 
 org_dict = {'BSBK0002': '总行营业部', 'BSBK9901': '包头分行', 'BSBK9902': '赤峰分行', 'BSBK9903': '巴彦淖尔分行',
@@ -41,14 +41,10 @@ sql_res = " SELECT P.ACTV_MON,P.TRD_MON,P.MON_DIF,P.BHDT_BCH_CDE,P.PRODUCT_TYP,P
           " FROM LOAN_BASE_AMT P WHERE 1=1 " \
           " AND P.BHDT_BCH_CDE NOT IN (\'05\',\'08\',\'10\',\'14\') "
 data_res = pd.read_sql(sql_res, engine)
-# data_res['LOAN_TYP'].replace(loan_typ_dict, inplace=True)
-# data_res['RES_AMT'] = data_res['RES_AMT'].fillna(0)
-# data_res['BHDT_BCH_CDE'] = 'BSBK99' + data_res['BHDT_BCH_CDE']
-# data_res.rename(columns=col_dict, inplace=True)
+
 data_res_p1 = pd.pivot_table(data_res, values='RES_AMT', columns='TRD_MON',
                              index=['ACTV_MON', 'BHDT_BCH_CDE', 'PRODUCT_TYP', 'LOAN_TYP'], fill_value=0)
 data_res_p1.rename(index=org_dict, inplace=True)
-
 
 sql_due = " SELECT P.ACTV_MON,P.TRD_MON,P.MON_DIF,P.BHDT_BCH_CDE,P.PRODUCT_TYP,P.LOAN_TYP, P.NBR, P.RES_AMT " \
           " FROM LOAN_DUE_AMT P WHERE 1=1 " \
@@ -92,7 +88,7 @@ data_yql_p2 = pd.pivot_table(data_yqbs, values='YQ', columns='TRD_MON',
 
 
 # 生成数据报表
-with pd.ExcelWriter('D:\\test\\due_list229.xlsx') as writer:
+with pd.ExcelWriter('D:\\test\\due_list_db_228.xlsx') as writer:
     data_dis.to_excel(writer, sheet_name='放款总额', na_rep='0', float_format="%.4f")
     data_res_p1.to_excel(writer, sheet_name='还款计划本金余额', na_rep='0', float_format="%.4f")
     data_due_p1.to_excel(writer, sheet_name='逾期总额', na_rep='0', float_format="%.4f")

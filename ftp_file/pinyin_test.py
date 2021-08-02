@@ -20,7 +20,7 @@ wb = openpyxl.load_workbook(target_file_list)
 
 sheet = wb['user']
 col = sheet['D']
-l_py =[]
+
 for i in col:
     py_tmp = lazy_pinyin(i.value)
     str_tmp = ''
